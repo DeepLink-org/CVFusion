@@ -6,7 +6,7 @@ Elena is famous for her versatile in languages, who earns the title of Oraculum 
 # Installation
 
 ```shell
-git clone --recursive git@gitlab.bj.sensetime.com:platform/dlcompiler/elena.git
+git clone git@github.com:OpenComputeLab/CVFusion.git
 mkdir build && cd build
 cmake ..
 make -j8
