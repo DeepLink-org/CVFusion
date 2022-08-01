@@ -778,6 +778,44 @@ template <typename DeviceType>
 void DeviceCodegen<DeviceType>::visit(ir::Call *call_ptr) {
   if (call_ptr->func == CallFunction::Sync) {
     *this << "__syncthreads();" << endl;
+  } else if (call_ptr->func == CallFunction::bilinear_resize_preprocess &&
+             call_ptr->args->element.size() == 8) {
+    *this << "bilinear_resize_preprocess(";
+    visit(call_ptr->args->element[0]); 
+    *this << ", ";
+    visit(call_ptr->args->element[1]);
+    *this << ", ";
+    visit(call_ptr->args->element[2]);
+    *this << ", ";
+    visit(call_ptr->args->element[3]);
+    *this << ", &";
+    visit(call_ptr->args->element[4]);
+    *this << ", &";
+    visit(call_ptr->args->element[5]);
+    *this << ", &";
+    visit(call_ptr->args->element[6]);
+    *this << ", &";
+    visit(call_ptr->args->element[7]);
+    *this << ");";
+  } else if (call_ptr->func == CallFunction::bilinear_float_resize_preprocess&&
+             call_ptr->args->element.size() == 8) {
+    *this << "bilinear_float_resize_preprocess(";
+    visit(call_ptr->args->element[0]); 
+    *this << ", ";
+    visit(call_ptr->args->element[1]);
+    *this << ", ";
+    visit(call_ptr->args->element[2]);
+    *this << ", ";
+    visit(call_ptr->args->element[3]);
+    *this << ", &";
+    visit(call_ptr->args->element[4]);
+    *this << ", &";
+    visit(call_ptr->args->element[5]);
+    *this << ", &";
+    visit(call_ptr->args->element[6]);
+    *this << ", &";
+    visit(call_ptr->args->element[7]);
+    *this << ");";
   } else if (call_ptr->func == CallFunction::atomic_add &&
              call_ptr->args->element.size() == 2) {
     *this << "atomicAdd(&";

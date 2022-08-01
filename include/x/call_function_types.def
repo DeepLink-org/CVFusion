@@ -12,5 +12,7 @@ TYPE_CALL_FUNCTIONS(wmma_fragment)
 TYPE_CALL_FUNCTIONS(atomic_add)
 TYPE_CALL_FUNCTIONS(atomic_max)
 TYPE_CALL_FUNCTIONS(atomic_min)
+TYPE_CALL_FUNCTIONS(bilinear_resize_preprocess)
+TYPE_CALL_FUNCTIONS(bilinear_float_resize_preprocess)
 
 #undef TYPE_CALL_FUNCTIONS

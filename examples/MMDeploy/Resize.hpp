@@ -93,4 +93,96 @@ ir::TensorVarPtr BilinearFloat(const std::vector<ir::ExprPtr> &shape,
       name);
 }
 
+ir::TensorVarPtr BilinearCUDA(const std::vector<ir::ExprPtr> &shape,
+                          ir::Array<ir::IterVar> iter_vars,
+                          ir::TensorVarPtr input, 
+                          ir::ExprPtr src_h, ir::ExprPtr src_w,
+                          const std::string &name = "ResizeBilinear") {
+  ELENA_ASSERT(shape.size() == input->shape->size(), "ResizeBilinear");
+
+  auto zero = api::constant<uint64_t>(0);
+  auto one = api::constant<uint64_t>(1);
+  auto two = api::constant<uint64_t>(2);
+
+  auto inth = api::compute({two}, api::construct_indices({two}), api::constant<int32_t>(0), "inth");
+  auto intw = api::compute({two}, api::construct_indices({two}), api::constant<int32_t>(0), "intw");
+  auto cubh = api::compute({two}, api::construct_indices({two}), api::constant<int16_t>(0), "cubh");
+  auto cubw = api::compute({two}, api::construct_indices({two}), api::constant<int16_t>(0), "cubw");
+
+  auto resize_h = shape[0];
+  auto resize_w = shape[1];
+
+  // hack evaluate
+  std::vector<ir::ExprPtr> preprocess_args{src_h, resize_h, src_w, resize_w,
+                                          (*cubh)(zero), (*inth)(zero), (*cubw)(zero), (*intw)(zero)};
+  auto preprocess_call = std::make_shared<ir::Call>(
+            ir::CallFunction::bilinear_resize_preprocess,
+            std::make_shared<ir::Array<ir::Expr>>(preprocess_args),
+            ir::ScalarType::Int32);
+  inth  = api::compute({two}, api::construct_indices({one}), {}, preprocess_call, "inth");
+
+  return api::compute(
+      shape, iter_vars,
+      ((*cubh)(zero) * (*cubw)(zero) *
+           (*input)((*inth)(zero), (*intw)(zero),
+                    iter_vars[2]) +
+       (*cubh)(one) * (*cubw)(zero) *
+           (*input)((*inth)(one), (*intw)(zero),
+                    iter_vars[2]) +
+       (*cubh)(zero) * (*cubw)(one) *
+           (*input)((*inth)(zero), (*intw)(one),
+                    iter_vars[2]) +
+       (*cubh)(one) * (*cubw)(one) *
+           (*input)((*inth)(one), (*intw)(one),
+                    iter_vars[2]) +
+       api::constant<int>(2097152)) /
+          api::constant<int>(4194304),  //  (... + 1 << (22 - 1)) >> 22
+      name);
+}
+
+ir::TensorVarPtr BilinearFloatCUDA(const std::vector<ir::ExprPtr> &shape,
+                          ir::Array<ir::IterVar> iter_vars,
+                          ir::TensorVarPtr input, 
+                          ir::ExprPtr src_h, ir::ExprPtr src_w,
+                          const std::string &name = "ResizeBilinear") {
+  ELENA_ASSERT(shape.size() == input->shape->size(), "ResizeBilinear");
+
+  auto zero = api::constant<uint64_t>(0);
+  auto one = api::constant<uint64_t>(1);
+  auto two = api::constant<uint64_t>(2);
+
+  auto inth = api::compute({two}, api::construct_indices({two}), api::constant<int32_t>(0), "inth");
+  auto intw = api::compute({two}, api::construct_indices({two}), api::constant<int32_t>(0), "intw");
+  auto cubfh = api::compute({two}, api::construct_indices({two}), api::constant<float>(0), "cubh");
+  auto cubfw = api::compute({two}, api::construct_indices({two}), api::constant<float>(0), "cubw");
+
+  auto resize_h = shape[0];
+  auto resize_w = shape[1];
+
+  // hack evaluate
+  std::vector<ir::ExprPtr> preprocess_args{src_h, resize_h, src_w, resize_w,
+                                          (*cubfh)(zero), (*inth)(zero), (*cubfw)(zero), (*intw)(zero)};
+  auto preprocess_call = std::make_shared<ir::Call>(
+            ir::CallFunction::bilinear_float_resize_preprocess,
+            std::make_shared<ir::Array<ir::Expr>>(preprocess_args),
+            ir::ScalarType::Int32);
+  inth  = api::compute({two}, api::construct_indices({one}), {}, preprocess_call, "inth");
+
+  return api::compute(
+      shape, iter_vars,
+      ((*cubfh)(zero) * (*cubfw)(zero) *
+           (*input)((*inth)(zero), (*intw)(zero),
+                    iter_vars[2]) +
+       (*cubfh)(one) * (*cubfw)(zero) *
+           (*input)((*inth)(one), (*intw)(zero),
+                    iter_vars[2]) +
+       (*cubfh)(zero) * (*cubfw)(one) *
+           (*input)((*inth)(zero), (*intw)(one),
+                    iter_vars[2]) +
+       (*cubfh)(one) * (*cubfw)(one) *
+           (*input)((*inth)(one), (*intw)(one),
+                    iter_vars[2])), 
+      name);
+}
+
 }  // namespace Resize

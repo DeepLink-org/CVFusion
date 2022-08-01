@@ -10,7 +10,7 @@
 #include "Resize.hpp"
 #include "Runtime.hpp"
 
-#define BLOCK_SIZE 128  // for cuda device
+#define BLOCK_SIZE 32  // for cuda device
 
 int main(int argc, char *argv[]) {
   if (argc < 4) {
@@ -43,8 +43,11 @@ int main(int argc, char *argv[]) {
   Dtype dtype = Uint8;  // also support float32
   std::ostringstream gen_code;
   gen_code << Runtime::prelude;
-  if (device == "cuda")
+  if (device == "cuda") {
     gen_code << Runtime::cuda_prelude << BLOCK_SIZE << std::endl;
+    gen_code << Runtime::cuda_bilinear_preprocess_func
+             << Runtime::cuda_float_bilinear_preprocess_func;
+  }
 
   /* 2. Traverse diff Format generate different kernel */
   for (int cur_format = 1; cur_format <= 6; cur_format++) {
@@ -209,22 +212,32 @@ int main(int argc, char *argv[]) {
             cur_stage = Resize::Nearest(resize_shape, iter_vars, intermediate);
           } else if (ResizeInterpolation == Bilinear) {
             /* aim to uint8 condition */
-            arg_list.push_back(inth);
-            arg_list.push_back(intw);
             if (intermediate->get_dtype() == ir::ScalarType::Float32) {
-              arg_list.push_back(cubfh);
-              arg_list.push_back(cubfw);
-              cur_stage =
-                  Resize::BilinearFloat(resize_shape, iter_vars, intermediate,
-                                        cubfh, cubfw, inth, intw);
+              if(target == CUDA) {
+                cur_stage = Resize::BilinearFloatCUDA(resize_shape, iter_vars, intermediate, h, w);
+              } else {
+                arg_list.push_back(inth);
+                arg_list.push_back(intw);
+                arg_list.push_back(cubfh);
+                arg_list.push_back(cubfw);
+                cur_stage =
+                    Resize::BilinearFloat(resize_shape, iter_vars, intermediate,
+                                          cubfh, cubfw, inth, intw);
+              }  
               if (cur_format <= 4)
                 ResizeFloat = true;  // NV12 & NV21 is float dtype
             } else if (intermediate->get_dtype() == ir::ScalarType::UInt8) {
-              arg_list.push_back(cubh);
-              arg_list.push_back(cubw);
-              cur_stage =
-                  Resize::Bilinear(resize_shape, iter_vars, intermediate, cubh,
+              if(target == CUDA) {
+                cur_stage = Resize::BilinearCUDA(resize_shape, iter_vars, intermediate, h, w);
+              }
+              else {
+                arg_list.push_back(inth);
+                arg_list.push_back(intw);
+                arg_list.push_back(cubh);
+                arg_list.push_back(cubw);
+                cur_stage = Resize::Bilinear(resize_shape, iter_vars, intermediate, cubh,
                                    cubw, inth, intw);
+              }
             } else {
               ELENA_ABORT("Resize only receive uint8_t and float32 dtypes");
             }
@@ -293,12 +306,14 @@ int main(int argc, char *argv[]) {
       }
 
       if (target == CUDA) {
-        auto fuse = (*sch)[intermediate->op]->fuse(
-            {iter_vars[0], iter_vars[1], iter_vars[2]});
-        auto t = (*sch)[intermediate->op]->split(
-            fuse, api::constant<uint64_t>(BLOCK_SIZE));
-        (*sch)[intermediate->op]->set_bind(t.element[0], "blockIdx.x");
-        (*sch)[intermediate->op]->set_bind(t.element[1], "threadIdx.x");
+        auto h_bind = (*sch)[intermediate->op]->split(
+            iter_vars[0], api::constant<uint64_t>(BLOCK_SIZE));
+        auto w_bind = (*sch)[intermediate->op]->split(
+            iter_vars[1], api::constant<uint64_t>(BLOCK_SIZE));
+        (*sch)[intermediate->op]->set_bind(h_bind.element[0], "blockIdx.y");
+        (*sch)[intermediate->op]->set_bind(h_bind.element[1], "threadIdx.y");
+        (*sch)[intermediate->op]->set_bind(w_bind.element[0], "blockIdx.x");
+        (*sch)[intermediate->op]->set_bind(w_bind.element[1], "threadIdx.x");
       }
 
       sch = sch->normalize();
@@ -353,11 +368,8 @@ int main(int argc, char *argv[]) {
 
   if (target == CUDA) {
     if (ResizeOp)
-      gen_code << (ResizeFloat ? "" : Runtime::cuda_bilinear_preprocess_func)
-               << Runtime::cuda_float_bilinear_preprocess_func
-               << Runtime::cuda_call_func_begin
-               << (ResizeFloat ? Runtime::cuda_bilinear_float_func
-                               : Runtime::cuda_bilinear_func)
+      gen_code << Runtime::cuda_call_func_begin
+               << Runtime::cuda_bilinear_func
                << Runtime::call_func_end;
     else
       gen_code << Runtime::cuda_call_func_begin << Runtime::call_func_end;

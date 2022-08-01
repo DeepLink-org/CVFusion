@@ -305,8 +305,8 @@ ir::TensorVarPtr compute(const std::vector<ir::ExprPtr> &shape,
                          ir::Array<ir::IterVar> for_iter_vars,
                          ir::Array<ir::Expr> tensor_indices,
                          ir::ExprPtr fcompute, const std::string &name) {
-  if (shape.size() != tensor_indices.size())
-    ELENA_ABORT("tensor indices must have same dimension with shape");
+  // if (shape.size() != tensor_indices.size())
+  //   ELENA_ABORT("tensor indices must have same dimension with shape");
 
   ir::Array<ir::IterVar> tensor_itervar;
   static int i = 0;
