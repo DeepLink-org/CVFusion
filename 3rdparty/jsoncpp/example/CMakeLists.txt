@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 
 set(EXAMPLES
 	readFromString
-	readFromStream
+	# readFromStream
 	stringWrite
 	streamWrite
    )

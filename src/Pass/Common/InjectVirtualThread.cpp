@@ -218,10 +218,10 @@ class VTInjector : public MutatorBase<VTInjector> {
   }
 
  private:
-  std::unordered_map<ir::VarPtr, ir::ExprPtr> new_size;
-  std::unordered_set<std::string> relative_var_set;
   ir::IterVarPtr vthread_var;
   ir::ExprPtr vthread_extent;
+  std::unordered_set<std::string> relative_var_set;
+  std::unordered_map<ir::VarPtr, ir::ExprPtr> new_size;
   FindVarInExpr var_finder;
   // whethe the loop is already injected.
   bool injecting_vthread;

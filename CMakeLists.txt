@@ -33,7 +33,7 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(hasParent)
     set(CMAKE_CXX_FLAGS "-w ${CMAKE_CXX_FLAGS}")
 else()
-    set(CMAKE_CXX_FLAGS "-Wall -fno-rtti ${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "-Wall -Wno-sign-compare -Wno-int-in-bool-context -Wno-deprecated-declarations -fno-rtti ${CMAKE_CXX_FLAGS}")
 endif()
 
 

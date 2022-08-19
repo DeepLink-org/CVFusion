@@ -237,6 +237,7 @@ std::pair<ir::StmtPtr, ir::StmtPtr> RemoveIf(StmtPtr for_stmt,
           ELENA_ASSERT(ptr, "Failed to Cast to IfThenElse node");
           return reinterpret_cast<Node*>(ptr->then_case.get());
         }
+        else return node;
       }));
 
   if (if_ptr->else_case) {
@@ -248,6 +249,7 @@ std::pair<ir::StmtPtr, ir::StmtPtr> RemoveIf(StmtPtr for_stmt,
             ELENA_ASSERT(ptr, "Failed to Cast to IfThenElse node");
             return reinterpret_cast<Node*>(ptr->else_case.get());
           }
+          else return node;
         }));
   }
   return std::make_pair(then_for, else_for);

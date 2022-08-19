@@ -512,7 +512,7 @@ void InjectInline(SchedulePtr sch) {
       ExprPtr fcompute = cop->fcompute;
       std::copy(cop->iter_vars->element.begin(), cop->iter_vars->element.end(),
                 std::back_inserter(args->element));
-      for (int j = i; j < sch->stages->element.size(); ++j) {
+      for (size_t j = i; j < sch->stages->element.size(); ++j) {
         StagePtr s = sch->stages->element[j];
         if (s->op->get_type() == IRNodeType::ComputeOp) {
           const ComputeOpPtr copj = ir::ptr_cast<ComputeOp>(s->op);

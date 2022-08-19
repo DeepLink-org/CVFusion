@@ -232,7 +232,7 @@ void inferRootBound(
   // The consumers of the op.
   ir::TensorVarMap<std::vector<std::vector<IntSetPtr>>> tmap;
   std::unordered_set<ir::OpPtr> consumers;
-  for (int i = 0; i < stage->op->output_count(); i++) {
+  for (size_t i = 0; i < stage->op->output_count(); i++) {
     auto t = stage->op->output(i);
     auto it = feed_graph.find(t);
     tmap.emplace(t, std::vector<std::vector<IntSetPtr>>(t->shape->size()));
@@ -293,7 +293,7 @@ void inferRootBound(
   auto compute_op = ir::ptr_cast<ir::ComputeOp>(stage->op);
   auto IntSet_vector = tmap.at(compute_op->output(0));
   auto output_tensor = compute_op->output(0);
-  for (int i = 0; i < compute_op->iter_vars->element.size(); i++) {
+  for (size_t i = 0; i < compute_op->iter_vars->element.size(); i++) {
     auto intset_list = tmap[output_tensor][i];
     if (intset_list.empty()) {
       // use origin range if true (now especially for norm,

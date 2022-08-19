@@ -170,13 +170,10 @@ ExprPtr Monomial::asExpr() const {
 ScalarType Monomial::getDtype() const { return expr_->get_dtype(); }
 
 void Monomial::simpl() {
-  expr_ = ::ir::ptr_cast<Expr>(SingleVarSimplifier::simplifyNode(expr_.get()));
+  // expr_ = ::ir::ptr_cast<Expr>(SingleVarSimplifier::simplifyNode(expr_.get()));
   if (expr_->get_type() == IRNodeType::Const) var_map_.clear();
 }
 
-// void Monomial::getCoefficient() {
-//   expr_ = ::ir::ptr_cast<Expr>(CoefficientGetter::simplifyNode(expr_.get()));
-// }
 
 int Monomial::isNormalForm() const {
   auto dtype = expr_->get_dtype();

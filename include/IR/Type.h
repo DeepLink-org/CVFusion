@@ -30,7 +30,7 @@ enum class IRNodeType : int {
  * @brief Printable names for IRNodeType values.
  * @author xupengcheng
  */
-static const char *IRNodeTypeName[] = {
+static const char * const IRNodeTypeName[] = {
 #define IR_NODE_TYPE(type) #type,
 #include "x/ir_node_types.def"
 };
@@ -44,8 +44,7 @@ enum class CallFunction : int {
 #define TYPE_CALL_FUNCTIONS(type) type,
 #include "x/call_function_types.def"
 };
-
-static const char *CallFunctionName[] = {
+static const char * const CallFunctionName[] = {
 #define TYPE_CALL_FUNCTIONS(type) #type,
 #include "x/call_function_types.def"
 };
@@ -60,7 +59,7 @@ enum class BinaryType : int {
 #include "x/binary_types.def"
 };
 
-static const char *BinaryTypeSymbol[] = {
+static const char * const BinaryTypeSymbol[] = {
 #define TYPE_BINARYTYPE_OP_MAP(opname, op) #op,
 #include "x/binary_types.def"
 };
@@ -75,7 +74,7 @@ enum class LogicalType : int {
 #include "x/logical_types.def"
 };
 
-static const char *LogicalTypeSymbol[] = {
+static const char * const LogicalTypeSymbol[] = {
 #define TYPE_LOGICALTYPE_OP_MAP(opname, op) #op,
 #include "x/logical_types.def"
 };
@@ -89,7 +88,7 @@ enum class UnaryType : int {
 #define TYPE_UNARYTYPE_OP_MAP(opname, op) opname,
 #include "x/unary_types.def"
 };
-static const char *UnaryTypeSymbols[] = {
+static const char * const UnaryTypeSymbols[] = {
 #define TYPE_UNARYTYPE_OP_MAP(opname, op) #op,
 #include "x/unary_types.def"
 };
@@ -105,7 +104,7 @@ enum class ScalarType : int {
 #include "x/scalar_types.def"
 };
 
-static const char *ScalarTypeSymbols[]{
+static const char * const ScalarTypeSymbols[]{
 #define TYPE_MAP_NATIVE_TO_SCALARTYPE(native_type, type) #native_type,
 #include "x/scalar_types.def"
 };
@@ -169,7 +168,7 @@ enum class AttrType : int {
 #include "x/attr_types.def"
 };
 
-static const char *AttrTypeNames[] = {
+static const char * const AttrTypeNames[] = {
 #define TYPE_ATTR(type) #type,
 #include "x/attr_types.def"
 };

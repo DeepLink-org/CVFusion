@@ -259,7 +259,7 @@ class Polynomial {
  * expression with similiar patterns, please declare another simplifier and copy
  * the patterns, DO NOT use this simplifier directly.
  */
-DECLR_PATTERN_SIMPLIFIER(SingleVarSimplifier);
+// DECLR_PATTERN_SIMPLIFIER(SingleVarSimplifier);
 
 /**
  * @brief Set VarPH to 1 in expression.
@@ -270,13 +270,13 @@ DECLR_PATTERN_SIMPLIFIER(CoefficientGetter);
  * @brief Simplify an expression before using `NumericSimplifier` and
  * `BoolSimplifier`.
  */
-DECLR_PATTERN_SIMPLIFIER(PreSimplifier);
+// DECLR_PATTERN_SIMPLIFIER(PreSimplifier);
 
 /**
  * @brief Simplify an expression before using `NumericSimplifier` and
  * `BoolSimplifier`.
  */
-DECLR_PATTERN_SIMPLIFIER(PostSimplifier);
+// DECLR_PATTERN_SIMPLIFIER(PostSimplifier);
 
 template <typename T>
 NodePtr ExprSimplifier::visit(Array<T>* node) {

@@ -67,17 +67,17 @@ using namespace ir;  // NOLINT
 // clang-format on
 
 #define SECOND_AS_STRING(UNARY, OP) #OP,
-static const char *UOpNames[] = {
+static const char * const UOpNames[] = {
     UNARY_TYPE_DEVICE(SECOND_AS_STRING, SECOND_AS_STRING)};
 #define UOP_DEVICE_NAME(x) (UOpNames[static_cast<int>(x)])
 
 #define SECOND_APPEND_F(UNARY, OP) #OP "f",
-static const char *UOpNames_f[] = {
+static const char * const UOpNames_f[] = {
     UNARY_TYPE_DEVICE(SECOND_AS_STRING, SECOND_APPEND_F)};
 #define UOP_DEVICE_NAME_F(x) (UOpNames_f[static_cast<int>(x)])
 
 #define SECOND_APPEND_H(UNARY, OP) "h" #OP,
-static const char *h_UOpNames[] = {
+static const char * const h_UOpNames[] = {
     UNARY_TYPE_DEVICE(SECOND_AS_STRING, SECOND_APPEND_H)};
 #define H_UOP_DEVICE_NAME(x) (h_UOpNames[static_cast<int>(x)])
 

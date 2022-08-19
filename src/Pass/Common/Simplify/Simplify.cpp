@@ -24,15 +24,11 @@ NodePtr ExprSimplifier::simplifyNode(NodePtr node) {
 
 ExprPtr ExprSimplifier::simplifyExpr(Expr* node) {
   if (!node) return nullptr;
-
-  ExprPtr expr = ptr_cast<Expr>(PreSimplifier::simplifyNode(node));
-
+  ExprPtr expr;
   if (expr->get_dtype() == ScalarType::Boolean)
     expr = BoolSimplifier::simplifyNode(expr.get());
   else
     expr = NumericSimplifier::simplifyExpr(expr.get());
-
-  expr = ptr_cast<Expr>(PostSimplifier::simplifyNode(expr.get()));
   return expr;
 }
 

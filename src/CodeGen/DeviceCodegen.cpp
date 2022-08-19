@@ -41,7 +41,7 @@ void DeviceCodegen<DeviceType>::visit(ir::ScalarAssign *sa_ptr) {
 template <typename DeviceType>
 void DeviceCodegen<DeviceType>::visit(ir::BroadcastSymbol *BS_ptr) {
   *this << "make_float" << BS_ptr->get_lanes() << "(";
-  for (int i = 0; i < BS_ptr->get_lanes() - 1; i++) {
+  for (size_t i = 0; i < BS_ptr->get_lanes() - 1; i++) {
     visit(BS_ptr->base_);
     *this << ", ";
   }
@@ -1265,7 +1265,7 @@ static inline std::string genDeviceSrc(
       visitor << str << "* __restrict__ Var" << arg_list[i].first;
     };
 
-    for (int i = 0; i < arg_list.size() - 1; ++i) {
+    for (size_t i = 0; i < arg_list.size() - 1; ++i) {
       visit_arg(i);
       visitor << ", ";
     }
@@ -1344,7 +1344,7 @@ static inline std::string genDeviceSrc(const ir::NodePtr &node,
       }
     };
 
-    for (int i = 0; i < arg_list.size() - 1; ++i) {
+    for (size_t i = 0; i < arg_list.size() - 1; ++i) {
       visit_arg(i);
       visitor << ", ";
     }

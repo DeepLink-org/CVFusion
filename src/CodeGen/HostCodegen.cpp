@@ -242,7 +242,7 @@ void HostCodeGen::visitMain() {
 
 void HostCodeGen::visitHostMalloc() {
   OUTPUT << "//alloc host memory" << std::endl;
-  for (int i = 0; i < arg_list_.size(); ++i) {
+  for (size_t i = 0; i < arg_list_.size(); ++i) {
     OUTPUT << SCALARTYPE_SYMBOL(arg_list_[i].second) << " *"
            << "h_Var" << i << " = (" << SCALARTYPE_SYMBOL(arg_list_[i].second)
            << "*)malloc(sizeof(" << SCALARTYPE_SYMBOL(arg_list_[i].second)
@@ -260,8 +260,8 @@ void HostCodeGen::visitHostMalloc() {
 
 void HostCodeGen::visitDummyData() {
   OUTPUT << "//generate dummy data for test" << std::endl;
-  for (int i = 0; i < arg_list_.size(); ++i) {
-    OUTPUT << "for (int i = 0; i < " << tensor_size_[i] << "; ++i)"
+  for (size_t i = 0; i < arg_list_.size(); ++i) {
+    OUTPUT << "for (size_t i = 0; i < " << tensor_size_[i] << "; ++i)"
            << std::endl;
     OUTPUT << "{" << std::endl;
     increaseIndent();
@@ -274,7 +274,7 @@ void HostCodeGen::visitDummyData() {
 
 void HostCodeGen::visitDeviceMalloc() {
   OUTPUT << "//alloc device memory" << std::endl;
-  for (int i = 0; i < arg_list_.size(); ++i) {
+  for (size_t i = 0; i < arg_list_.size(); ++i) {
     OUTPUT << SCALARTYPE_SYMBOL(arg_list_[i].second) << " *"
            << "d_Var" << i << ";" << std::endl;
     OUTPUT << "SAFE_CALL(" << dev_pre << "Malloc((void **)&d_Var" << i
@@ -285,7 +285,7 @@ void HostCodeGen::visitDeviceMalloc() {
 }
 void HostCodeGen::visitCopy2Device() {
   OUTPUT << "//memcpy h2d" << std::endl;
-  for (int i = 0; i < arg_list_.size(); ++i) {
+  for (size_t i = 0; i < arg_list_.size(); ++i) {
     OUTPUT << "SAFE_CALL(" << dev_pre << "Memcpy("
            << "d_Var" << i << ", h_Var" << i << ", sizeof("
            << SCALARTYPE_SYMBOL(arg_list_[i].second) << ") * "
@@ -406,7 +406,7 @@ void HostCodeGen::visiKernelLaunch() {
   switch (target_) {
     case backend::TargetType::NVGPU:
       OUTPUT << "default_function_kernel0<<<grid_size, block_size>>>(";
-      for (int i = 0; i < tensor_size_.size() - 1; ++i) {
+      for (size_t i = 0; i < tensor_size_.size() - 1; ++i) {
         output << "d_Var" << i << ", ";
       }
       output << "d_Var" << tensor_size_.size() - 1 << ");" << std::endl;
@@ -435,7 +435,7 @@ void HostCodeGen::visiKernelLaunch() {
 
     case backend::TargetType::NVGPU_RTC:
       OUTPUT << "void *args[] = {";
-      for (int i = 0; i < tensor_size_.size() - 1; ++i) {
+      for (size_t i = 0; i < tensor_size_.size() - 1; ++i) {
         output << "&d_Var" << i << ", ";
       }
       output << "&d_Var" << tensor_size_.size() - 1 << "};" << std::endl;
@@ -453,7 +453,7 @@ void HostCodeGen::visiKernelLaunch() {
     case backend::TargetType::AMDGPU:
       OUTPUT << "hipLaunchKernelGGL(default_function_kernel0, grid_size, "
                 "block_size, 0, 0, ";
-      for (int i = 0; i < tensor_size_.size() - 1; ++i) {
+      for (size_t i = 0; i < tensor_size_.size() - 1; ++i) {
         output << "d_Var" << i << ", ";
       }
       output << "d_Var" << tensor_size_.size() - 1 << ");" << std::endl;
@@ -462,13 +462,13 @@ void HostCodeGen::visiKernelLaunch() {
     case backend::TargetType::AMDGPU_RTC:
       OUTPUT << "struct {" << std::endl;
       increaseIndent();
-      for (int i = 0; i < arg_list_.size(); ++i) {
+      for (size_t i = 0; i < arg_list_.size(); ++i) {
         OUTPUT << SCALARTYPE_SYMBOL(arg_list_[i].second) << " *Var" << i << ';'
                << std::endl;
       }
       decreaseIndent();
       OUTPUT << "} args{";
-      for (int i = 0; i < arg_list_.size() - 1; ++i) {
+      for (size_t i = 0; i < arg_list_.size() - 1; ++i) {
         output << "d_Var" << i << ", ";
       }
       output << "d_Var" << arg_list_.size() - 1 << "};" << std::endl;
@@ -512,13 +512,13 @@ void HostCodeGen::visitResult() {
   OUTPUT << "}" << std::endl;
 
   OUTPUT << "default_x86_kernel(";
-  for (int i = 0; i < tensor_size_.size() - 1; ++i) {
+  for (size_t i = 0; i < tensor_size_.size() - 1; ++i) {
     output << "h_Var" << i << ',';
   }
   output << " h_Result"
          << ");" << std::endl;
 
-  OUTPUT << "for (int i = 0; i < " << tensor_size_[0] << "; ++i)" << std::endl;
+  OUTPUT << "for (size_t i = 0; i < " << tensor_size_[0] << "; ++i)" << std::endl;
   OUTPUT << "{" << std::endl;
   increaseIndent();
   OUTPUT << "if (abs(h_Result[i] - h_Var0[i]) > 1e-5)" << std::endl;
@@ -537,12 +537,12 @@ void HostCodeGen::visitResult() {
 
 void HostCodeGen::visitEpilogue() {
   OUTPUT << "//free host memory" << std::endl;
-  for (int i = 0; i < arg_list_.size(); ++i) {
+  for (size_t i = 0; i < arg_list_.size(); ++i) {
     OUTPUT << "free(h_Var" << i << ");" << std::endl;
   }
   OUTPUT << "free(h_Result);" << std::endl;
 
-  for (int i = 0; i < arg_list_.size(); ++i) {
+  for (size_t i = 0; i < arg_list_.size(); ++i) {
     OUTPUT << "SAFE_CALL(" << dev_pre << "Free(d_Var" << i << "));"
            << std::endl;
   }

@@ -27,7 +27,6 @@
 #include "IR/Type.h"
 #include "Pass/Common/HoistIfThenElse.h"
 #include "Pass/Common/InjectVirtualThread.h"
-#include "Pass/Common/StatementSimplify.h"
 #include "Pass/Common/StmtCopy.h"
 #include "Pass/Common/StorageFlatten.h"
 #include "Pass/Common/StorageRewrite.h"

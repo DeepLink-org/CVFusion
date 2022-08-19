@@ -109,6 +109,7 @@ ExprPtr PatternSimplifier::eval(ExprPtr lhs, ExprPtr rhs, BinaryType op) {
     }                                                                         \
   }
 
+#undef TYPE_MAP_NATIVE_TO_SCALARTYPE_FP
 #define TYPE_MAP_NATIVE_TO_SCALARTYPE_FP(native_type, scalar_type)   \
   case ScalarType::scalar_type: {                                    \
     auto lhs_c = ir::ptr_cast<Const<native_type>>(lhs);              \
